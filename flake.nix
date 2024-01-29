@@ -32,15 +32,16 @@
             program = "${exec}/bin/${name}";
           };
 
+          pyscript = "${self}/clean_bib.py";
+
         in with pkgs;
           {
             ###################################################################
             #                       running                                   #
             ###################################################################
             apps = {
-              default = simple_script "clean_bib" [] ''
-                echo "Cleaning bib"
-                python clean_bib.py "''$@"
+              default = simple_script "pyscript" [] ''
+                python ${pyscript} "''$@"
               '';
             };
 
