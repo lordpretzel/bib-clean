@@ -268,8 +268,6 @@ help = "bib_clean -i input.bib -o output.bib [-p]aper [-O]verwrite [-s] string (
 options = {}
 
 # read options
-print(f"Options: {sys.argv}")
-
 try:
     opts, args = getopt.getopt(sys.argv[1:], "i:o:pOhs:")
 except getopt.GetoptError as e:
