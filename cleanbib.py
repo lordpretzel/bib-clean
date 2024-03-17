@@ -138,7 +138,10 @@ name_shortcuts = {
     "Advances in Neural Information Processing Systems": "NIPS",
     "Neural Information Processing Systems ": "NIPS",
     "International Conference on Data Mining": "ICDM",
-    "Knowledge and information systems": "KAIS"
+    "Knowledge and information systems": "KAIS",
+    "Conference on Fairness, Accountability, and Transparency": "FAT",
+    "FAT": "FAT",
+    "DASFAA": "DASFAA"
 }
 
 def fixConfJournal(record, fieldname):
