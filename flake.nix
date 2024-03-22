@@ -18,9 +18,9 @@
 
           requirements-txt = "${self}/requirements.txt";
           requirements-as-text = builtins.readFile requirements-txt;
-          
+
           # python environment
-          mypython = 
+          mypython =
               mach-nix.lib."${system}".mkPython {
                 requirements = builtins.readFile requirements-txt;
               };
@@ -41,7 +41,7 @@
           # the python script to wrap as an app
           script-base-name = "cleanbib";
           script-name = "${script-base-name}.py";
-          pyscript = "${self}/${script-name}";          
+          pyscript = "${self}/${script-name}";
         in with pkgs;
           {
             ###################################################################
@@ -51,7 +51,7 @@
               cleanbib = stdenv.mkDerivation {
                 name="cleanbib-1.0";
                 src = ./.;
-                
+
                 runtimeInputs = [ mypython ];
                 buildInputs = [ mypython ];
                 nativeBuildInputs = [ makeWrapper ];
@@ -59,17 +59,22 @@
                   mkdir -p $out/bin/
                   mkdir -p $out/share/
                   cp ${pyscript} $out/share/${script-name}
-                  makeWrapper ${mypython}/bin/python $out/bin/${script-base-name} --add-flags "$out/share/${script-name}" 
-                '';                
+                  makeWrapper ${mypython}/bin/python $out/bin/${script-base-name} --add-flags "$out/share/${script-name}"
+                '';
               };
             };
-            
+
             ###################################################################
             #                       running                                   #
             ###################################################################
             apps = {
               default = simple_script "pyscript" [] ''
                 python ${pyscript} "''$@"
+              '';
+
+              update-package = simple_script "update-package" [] ''
+                nix build .#cleanbib
+                nix profile upgrade packages.${system}.cleanbib
               '';
             };
 
@@ -87,7 +92,7 @@
                   echo "Using virtual environment with Python
 $(python --version)
 with packages
-${requirements-as-text}" | chara say
+${requirements-as-text}" | chara say -f null.chara
                 '';
               };
           }

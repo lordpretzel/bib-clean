@@ -5,13 +5,15 @@ import getopt
 import sys
 import os
 import bibtexparser
+import argparse as ap
 from bibtexparser.bparser import BibTexParser
 from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.customization import *
 
-input_b = None
+input = None
 output_b = None
 overwrite = False
+VERSION = "0.1.1"
 
 now = datetime.datetime.now()
 
@@ -94,6 +96,7 @@ name_shortcuts = {
     "Principles of database systems": "PODS",
     "Proc. VLDB Endow.": "PVLDB",
     "Proceedings of the VLDB Endowment": "PVLDB",
+    "SIGMOD International Conference": "SIGMOD",
     "SIGMOD Conference": "SIGMOD",
     "SIGMOD Record": "SIGMOD Record",
     "SIGRAD": "SIGRAD",
@@ -177,24 +180,19 @@ def customizations(record):
 def shorten_conf_and_journal_names(record):
     return record
 
-
 def checkArgs(opt):
-    if (not "input_b" in opt) and (not 'bibstr' in opt):
-        print(opt)
-        print(help)
-        sys.exit(2)
-    if ((not 'bibstr' in opt) and opt['overwrite'] is False and (not 'output_b' in opt)):
-        print(opt)
-        print(help)
-        sys.exit(2)
+    if not opt["input"] and not opt['bibstr']:
+        raise Exception("Either need input file or bibtex string as input")
+    if not opt['bibstr'] and not opt['overwrite'] and opt['output']:
+        if os.path.exists(opt['output']):
+            raise Exception(f"Output file {opt['output']} exists (specify -o to overwrite)")
     if (overwrite):
-        opt['output_b'] = "_output.bib"
-
+        opt['output'] = "_output.bib"
 
 def readBibtex(opt):
-    if 'input_b' in opt:
-        print("parse bibtex file {}".format(opt['input_b']))
-        with open(opt['input_b']) as bibtex_file:
+    if opt['input']:
+        print("parse bibtex file {}".format(opt['input']))
+        with open(opt['input']) as bibtex_file:
             parser = BibTexParser()
             parser.customization = customizations
             parser.ignore_nonstandard_types = False
@@ -214,14 +212,14 @@ def fail(err):
 
 
 def checkBibDatabase(opt):
-    if 'input_b' in opt:
+    if opt['input']:
         if opt['bib_database']:
             now = datetime.datetime.now()
             success = "{0} Loaded {1} found {2} entries".format(
-                now, opt['input_b'], len(opt['bib_database'].entries))
+                now, opt['input'], len(opt['bib_database'].entries))
             print(success)
         else:
-            fail("Failed to read {1}".format(opt['input_b']))
+            fail("Failed to read {1}".format(opt['input']))
     else:
         if not ('bib_database' in opt):
             fail("Failed to parse {1}".format(opt['bibstr']))
@@ -236,20 +234,20 @@ def createBibtexString(opt):
 def writeBibtex(opt):
     opt['bibtex_str'] = createBibtexString(opt)
     # print(str(bibtex_str))
-    with open(opt['output_b'], "w") as text_file:
+    with open(opt['output'], "w") as text_file:
         print(opt['bibtex_str'], file=text_file)
     if opt['bibtex_str']:
         now = datetime.datetime.now()
         success = "{0} Wrote to {1} with len {2}".format(
-            now, opt['output_b'], len(opt['bibtex_str']))
+            now, opt['output'], len(opt['bibtex_str']))
         print(success)
         if opt['overwrite']:
-            os.remove(opt['input_b'])
-            os.rename(opt['output_b'], opt['input_b'])
-            print("overwrote original file {}".format(opt['input_b']))
+            os.remove(opt['input'])
+            os.rename(opt['output'], opt['input'])
+            print("overwrote original file {}".format(opt['input']))
     else:
         now = datetime.datetime.now()
-        errs = "{0} Failed to write {1}".format(now, opt['output_b'])
+        errs = "{0} Failed to write {1}".format(now, opt['output'])
         print(errs)
         sys.exit(errs)
 
@@ -261,51 +259,38 @@ def printBibtex(opt):
 
 def outputBibtex(opt):
     if opt['bib_database']:
-        if 'output_b' in opt:
+        if opt['output']:
             writeBibtex(opt)
         else:
             printBibtex(opt)
 
 
-help = "bib_clean -i input.bib -o output.bib [-p]aper [-O]verwrite [-s] string (pass bibtex input as string)"
-options = {}
+def parseOpts():
+    parser = ap.ArgumentParser(prog="cleanbib",
+                               description=f'cleanbib [{VERSION}] Clean up bibtex entries by removing fields and abbreviating conference and journal names.')
+    parser.add_argument('-i','--input', default=None,help="Input bibtex file to clean")
+    parser.add_argument('-o','--output',default=None,help="Write cleaned bibtex entries to this file.")
+    parser.add_argument("-O",'--overwrite', default=True, help="Overwrite output file if it exists?")
+    parser.add_argument("-s",'--bibstr', default=None,help="clean this string instead of reading from an input file.")
+    parser.add_argument('-p','--for-paper',type=bool,default=True,help="for papers (removes more fields")
 
-# read options
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "i:o:pOhs:")
-except getopt.GetoptError as e:
-    print(help)
-    print("Exception {}\n\n{}\n", type(e), e.args)
-    sys.exit(2)
-
-# defaults
-options['overwrite'] = False
-options['if_for_paper'] = False
-
-# process options
-for opt, arg in opts:
-    if opt == "-i":
-        options['input_b'] = arg
-    elif opt == "-o":
-        options['output_b'] = arg
-    elif opt == "-p":  # for paper, remove more
-        options['if_for_paper'] = True
-    elif opt == "-O":
-        options['overwrite'] = True
-    elif opt == "-s":
-        options['bibstr'] = arg
-    elif opt == "-h":
-        print(help)
-        sys.exit(2)
-    else:
-        print("unknown option {}".format(opt))
-        print(help)
+    try:
+        options = parser.parse_args()
+        options = vars(options)
+        checkArgs(options)
+        return options
+    except Exception as e:
+        parser.print_usage()
+        print("Exception {}\n\n{}\n", type(e), e.args)
         sys.exit(2)
 
-# check args
-checkArgs(options)
+def main():
+    options = parseOpts()
 
-options['bib_database'] = readBibtex(options)
-checkBibDatabase(options)
+    options['bib_database'] = readBibtex(options)
+    checkBibDatabase(options)
 
-outputBibtex(options)
+    outputBibtex(options)
+
+if __name__ == '__main__':
+    main()
