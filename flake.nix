@@ -22,9 +22,15 @@
           # python environment
           mypython =
               mach-nix.lib."${system}".mkPython {
-                requirements = builtins.readFile requirements-txt;
+                requirements = requirements-as-text;
               };
 
+          mydevpython =
+              mach-nix.lib."${system}".mkPython {
+                requirements = requirements-as-text +  "\npip";
+              };
+
+          
           # Utility to run a script easily in the flakes app
           simple_script = name: add_deps: text: let
             exec = pkgs.writeShellApplication {
@@ -85,14 +91,18 @@
               {
                 buildInputs = [
                   pkgs.charasay
-                  mypython
+                  mydevpython
                 ];
-                runtimeInputs = [ mypython ];
+                runtimeInputs = [ mydevpython ];
                 shellHook = ''
+                  alias pip="${mydevpython}/bin/pip --disable-pip-version-check"
                   echo "Using virtual environment with Python
+
 $(python --version)
+
 with packages
-${requirements-as-text}" | chara say -f null.chara
+
+$(${mydevpython}/bin/pip list --no-color --disable-pip-version-check)" | chara say -f null.chara
                 '';
               };
           }
