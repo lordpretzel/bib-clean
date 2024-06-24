@@ -48,6 +48,8 @@
           script-base-name = "cleanbib";
           script-name = "${script-base-name}.py";
           pyscript = "${self}/${script-name}";
+          version = "1.0";
+          package-name = "${script-base-name}-${version}";
         in with pkgs;
           {
             ###################################################################
@@ -55,7 +57,7 @@
             ###################################################################
             packages = {
               cleanbib = stdenv.mkDerivation {
-                name="cleanbib-1.0";
+                name="${package-name}";
                 src = ./.;
 
                 runtimeInputs = [ mypython ];
@@ -90,19 +92,18 @@
             devShells.default = mkShell
               {
                 buildInputs = [
-                  pkgs.charasay
+                  pkgs.rich-cli
                   mydevpython
                 ];
                 runtimeInputs = [ mydevpython ];
                 shellHook = ''
-                  alias pip="${mydevpython}/bin/pip --disable-pip-version-check"
-                  echo "Using virtual environment with Python
+          rich "[b white on black]Using virtual environment for [/][b white on red] ${package-name} [/][b white on black] with Python[/]
 
-$(python --version)
+[b]$(python --version)[/]
 
-with packages
+[b white on black]with packages[/]
 
-$(${mydevpython}/bin/pip list --no-color --disable-pip-version-check)" | chara say -f null.chara
+$(${mydevpython}/bin/pip list --no-color --disable-pip-version-check)" --print --padding 1 -p -a heavy
                 '';
               };
           }
