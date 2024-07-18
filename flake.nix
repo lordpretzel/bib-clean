@@ -27,7 +27,12 @@
 
           mydevpython =
               mach-nix.lib."${system}".mkPython {
-                requirements = requirements-as-text +  "\npip";
+                requirements = requirements-as-text +  ''
+pip
+python-lsp-server[all]
+rich-cli
+mypy
+'';
               };
 
           
@@ -92,7 +97,6 @@
             devShells.default = mkShell
               {
                 buildInputs = [
-                  pkgs.rich-cli
                   mydevpython
                 ];
                 runtimeInputs = [ mydevpython ];
