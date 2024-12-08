@@ -138,13 +138,15 @@ name_shortcuts = {
     "KDD": "SIGKDD",
     "Journal of Machine Learning Research": "JMLR",
     "International Joint Conference on Artificial Intelligence": "IJCAI",
-    "Advances in Neural Information Processing Systems": "NIPS",
-    "Neural Information Processing Systems ": "NIPS",
+    "Advances in Neural Information Processing Systems": "NeurIPS",
+    "Neural Information Processing Systems ": "NeurIPS",
     "International Conference on Data Mining": "ICDM",
     "Knowledge and information systems": "KAIS",
     "Conference on Fairness, Accountability, and Transparency": "FAT",
     "FAT": "FAT",
-    "DASFAA": "DASFAA"
+    "DASFAA": "DASFAA",
+    "international conference on computer vision": "ICCV",
+    "ICCV": "ICCV",
 }
 
 def fixConfJournal(record, fieldname):
