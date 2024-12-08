@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
-import getopt
 import sys
 import os
 import bibtexparser
 import argparse as ap
 from bibtexparser.bparser import BibTexParser
 from bibtexparser.bwriter import BibTexWriter
-from bibtexparser.customization import *
+from bibtexparser.customization import page_double_hyphen, convert_to_unicode
 
 input = None
 output_b = None
@@ -117,9 +116,6 @@ name_shortcuts = {
     "symposium on Theory of computing": "STOC",
     "SDM": "SDM",
     "SIAM International Conference on Data Mining": "SDM",
-    "NeurIPS": "NIPS",
-    "Conference on Neural Information Processing Systems": "NIPS",
-    "NIPS": "NIPS",
     "Architectural Support for Programming Languages and Operating Systems": "ASPLOS",
     "ASPLOS": "ASPLOS",
     "Symposium on Code Generation and Optimization": "CGO",
@@ -140,12 +136,16 @@ name_shortcuts = {
     "International Joint Conference on Artificial Intelligence": "IJCAI",
     "Advances in Neural Information Processing Systems": "NeurIPS",
     "Neural Information Processing Systems ": "NeurIPS",
+    "NeurIPS": "NeurIPS",
     "International Conference on Data Mining": "ICDM",
     "Knowledge and information systems": "KAIS",
     "Conference on Fairness, Accountability, and Transparency": "FAT",
     "FAT": "FAT",
     "DASFAA": "DASFAA",
     "international conference on computer vision": "ICCV",
+    "ICCV": "ICCV",
+    "Conference on Computer Vision and Pattern Recognition": "CVPR",
+    "CVPR": "CVPR",
     "ICCV": "ICCV",
 }
 
@@ -221,10 +221,10 @@ def checkBibDatabase(opt):
                 now, opt['input'], len(opt['bib_database'].entries))
             print(success)
         else:
-            fail("Failed to read {1}".format(opt['input']))
+            fail(f"Failed to read {opt['input']}")
     else:
         if not ('bib_database' in opt):
-            fail("Failed to parse {1}".format(opt['bibstr']))
+            fail(f"Failed to parse {opt['bibstr']}")
 
 
 def createBibtexString(opt):
@@ -270,11 +270,11 @@ def outputBibtex(opt):
 def parseOpts():
     parser = ap.ArgumentParser(prog="cleanbib",
                                description=f'cleanbib [{VERSION}] Clean up bibtex entries by removing fields and abbreviating conference and journal names.')
-    parser.add_argument('-i','--input', default=None,help="Input bibtex file to clean")
-    parser.add_argument('-o','--output',default=None,help="Write cleaned bibtex entries to this file.")
-    parser.add_argument("-O",'--overwrite', default=True, help="Overwrite output file if it exists?")
-    parser.add_argument("-s",'--bibstr', default=None,help="clean this string instead of reading from an input file.")
-    parser.add_argument('-p','--for-paper',type=bool,default=True,help="for papers (removes more fields")
+    parser.add_argument('-i', '--input', default=None, help="Input bibtex file to clean")
+    parser.add_argument('-o', '--output', default=None, help="Write cleaned bibtex entries to this file.")
+    parser.add_argument("-O", '--overwrite', default=True, help="Overwrite output file if it exists?")
+    parser.add_argument("-s", '--bibstr', default=None, help="clean this string instead of reading from an input file.")
+    parser.add_argument('-p', '--for-paper', type=bool, default=True, help="for papers (removes more fields")
 
     try:
         options = parser.parse_args()
@@ -293,6 +293,7 @@ def main():
     checkBibDatabase(options)
 
     outputBibtex(options)
+
 
 if __name__ == '__main__':
     main()
