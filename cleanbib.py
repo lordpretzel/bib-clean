@@ -146,7 +146,13 @@ name_shortcuts = {
     "ICCV": "ICCV",
     "Conference on Computer Vision and Pattern Recognition": "CVPR",
     "CVPR": "CVPR",
-    "ICCV": "ICCV",
+    "European Conference on Computer Vision": "ECCV",
+    "ECCV": "ECCV",
+    "European Conference on Computer Systems": "EuroSys",
+    "Data Management for End-to-End Machine Learning": "DEEM",
+    "North American Chapter of the Association for Computational Linguistics: Human Language Technologies": "NAACL-HLT",
+    "International Conference on Learning Representations": "ICLR",
+    "Human-In-the-Loop Data Analytics": "HILDA",
 }
 
 def fixConfJournal(record, fieldname):
