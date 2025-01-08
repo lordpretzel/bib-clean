@@ -168,7 +168,7 @@ def customizations(record):
     :param record: a record
     :returns: -- customized record
     """
-    record = type(record)
+    record = bibtexparser.customization.type(record)
     record = page_double_hyphen(record)
     record = convert_to_unicode(record)
     # delete the following keys.
