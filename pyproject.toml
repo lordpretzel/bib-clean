@@ -1,0 +1,15 @@
+[project]
+name = "bibclean"
+description = "Tools cleaning up bib files"
+version = "1.0"
+
+dependencies = [
+          'bibtexparser',
+]
+
+[project.scripts]
+bibclean = "bibclean.bibclean:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
