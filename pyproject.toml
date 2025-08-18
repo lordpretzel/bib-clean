@@ -8,7 +8,7 @@ dependencies = [
 ]
 
 [project.scripts]
-bibclean = "bibclean.bibclean:main"
+cleanbib = "bibclean.bibclean:main"
 
 [build-system]
 requires = ["setuptools"]

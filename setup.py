@@ -12,7 +12,7 @@ setup(name=package,
       packages = [ 'bibclean' ],
       entry_points={
           'console_scripts': [
-              'bibclean = bibclean.bibclean:main',
+              'cleanbib = bibclean.bibclean:main',
           ],
       },
       url='url')

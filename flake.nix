@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-#    mach-nix.url = "github:DavHau/mach-nix";
   };
 
 
@@ -35,8 +34,6 @@
 
           # the python script to wrap as an app
           script-base-name = "cleanbib";
-#          script-name = "${script-base-name}.py";
-#          pyscript = "${self}/${script-name}";
           package-version = "1.0";
           package-name = "${script-base-name}-${package-version}";
 
@@ -55,41 +52,6 @@
           });
 
           mydevpython = mypython.withPackages (ps: devrequirements);
-
-          
-#           requirements-txt = "${self}/requirements.txt";
-#           requirements-as-text = builtins.readFile requirements-txt;
-
-#           # python environment
-#           mypython =
-#               mach-nix.lib."${system}".mkPython {
-#                 requirements = requirements-as-text;
-#               };
-
-#           mydevpython =
-#               mach-nix.lib."${system}".mkPython {
-#                 requirements = requirements-as-text +  ''
-# pip
-# python-lsp-server[all]
-# rich-cli
-# mypy
-# '';
-#               };
-
-          
-#           # Utility to run a script easily in the flakes app
-#           simple_script = name: add_deps: text: let
-#             exec = pkgs.writeShellApplication {
-#               inherit name text;
-#               runtimeInputs = with pkgs; [
-#                 mypython
-#               ] ++ add_deps;
-#             };
-#           in {
-#             type = "app";
-#             program = "${exec}/bin/${name}";
-#           };
-
 
         in with pkgs;
           {
