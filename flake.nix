@@ -30,6 +30,7 @@
               pip
               python-lsp-server
               rich
+              pytest
             ]);
 
           # the python script to wrap as an app
@@ -77,6 +78,7 @@
                   rich-cli
                 ];
                 shellHook = ''
+                  export PYTHONPATH=.
                   alias pip="${mydevpython}/bin/pip --disable-pip-version-check"
                   rich "[b white on black]Using virtual environment for [/][b white on red] ${package-name} [/][b white on black] with Python[/]
 

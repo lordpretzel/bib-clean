@@ -9,9 +9,6 @@ from bibtexparser.bparser import BibTexParser
 from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.customization import page_double_hyphen, convert_to_unicode
 
-input = None
-output_b = None
-overwrite = False
 VERSION = "0.1.1"
 
 now = datetime.datetime.now()
@@ -194,7 +191,9 @@ def checkArgs(opt):
     if not opt['bibstr'] and not opt['overwrite'] and opt['output']:
         if os.path.exists(opt['output']):
             raise Exception(f"Output file {opt['output']} exists (specify -o to overwrite)")
-    if (overwrite):
+    # if the user wants to overwrite the input file then set output to some
+    # dummy filename
+    if opt['overwrite'] and opt['input']:
         opt['output'] = "_output.bib"
 
 def readBibtex(opt):
@@ -278,7 +277,7 @@ def parseOpts():
                                description=f'cleanbib [{VERSION}] Clean up bibtex entries by removing fields and abbreviating conference and journal names.')
     parser.add_argument('-i', '--input', default=None, help="Input bibtex file to clean")
     parser.add_argument('-o', '--output', default=None, help="Write cleaned bibtex entries to this file.")
-    parser.add_argument("-O", '--overwrite', default=True, help="Overwrite output file if it exists?")
+    parser.add_argument("-O", '--overwrite', action='store_true', default=False, help="Overwrite input file (inplace)")
     parser.add_argument("-s", '--bibstr', default=None, help="clean this string instead of reading from an input file.")
     parser.add_argument('-p', '--for-paper', type=bool, default=True, help="for papers (removes more fields")
 

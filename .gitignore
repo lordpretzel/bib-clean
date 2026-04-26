@@ -1,2 +1,6 @@
 /result
 /.direnv/
+/.agent-shell/
+__pycache__
+bibclean.egg-info
+auto
