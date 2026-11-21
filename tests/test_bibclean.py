@@ -69,6 +69,66 @@ def test_booktitle_abbreviation():
     assert record['booktitle'] == "VLDB"
 
 
+def test_longest_match_wins():
+    """Test that a specific venue name beats a generic key that is a substring of it."""
+    test_cases = [
+        ("Proceedings of the 39th {ACM} {SIGMOD-SIGACT-SIGAI} Symposium on "
+         "Principles of Database Systems", "PODS"),
+        ("Proceedings of the seventeenth ACM SIGACT-SIGMOD-SIGART symposium on "
+         "Principles of Database Systems", "PODS"),
+        ("USENIX Symposium on Operating Systems Design and Implementation", "OSDI"),
+        ("Proceedings of the 25th Symposium on Operating Systems Principles", "SOSP"),
+        ("Data Engineering Workshops, 2006. Proceedings. 22nd International "
+         "Conference on", "ICDEW"),
+        ("Data Engineering (ICDE), 2013 IEEE 29th International Conference on", "ICDE"),
+        ("Data Engineering", "IEEE Data Eng. Bull."),
+        ("IEEE Data Engineering Bulletin", "IEEE Data Eng. Bull."),
+        ("Knowledge Discovery in Databases: PKDD 2006", "PKDD"),
+        ("Machine Learning and Knowledge Discovery in Databases - European "
+         "Conference, {ECML} {PKDD} 2018", "ECML PKDD"),
+        ("ACM SIGCOMM Computer Communication Review", "ACM SIGCOMM Comput. Commun. Rev."),
+    ]
+
+    for full_name, expected_abbrev in test_cases:
+        record = {
+            'ENTRYTYPE': 'inproceedings',
+            'booktitle': full_name,
+            'author': 'Test Author',
+            'title': 'Test',
+            'year': '2024'
+        }
+        bibclean.fixConfJournal(record, "booktitle")
+        assert record['booktitle'] == expected_abbrev, f"Expected {expected_abbrev}, got {record['booktitle']}"
+
+
+def test_braces_and_whitespace_are_ignored():
+    """Test that braces and extra whitespace do not prevent a match."""
+    test_cases = [
+        ("{VLDB} J.", "VLDBJ"),
+        ("{PVLDB}", "PVLDB"),
+        ("  IEEE   Transactions   on   Software   Engineering  ", "TSE"),
+        ("Neural Information Processing Systems ", "NeurIPS"),
+    ]
+
+    for full_name, expected_abbrev in test_cases:
+        record = {'journal': full_name}
+        bibclean.fixConfJournal(record, "journal")
+        assert record['journal'] == expected_abbrev, f"Expected {expected_abbrev}, got {record['journal']}"
+
+
+def test_unrelated_venues_are_left_alone():
+    """Test that venues which merely contain a shortcut key are not renamed."""
+    for full_name in [
+        "Logics for databases and information systems",
+        "Computer Science and Information Systems",
+        "arXiv preprint arXiv:1211.6176",
+        "International Journal of Software Engineering and Applications",
+    ]:
+        record = {'journal': full_name}
+        bibclean.fixConfJournal(record, "journal")
+        assert record['journal'] == full_name, f"Expected no change, got {record['journal']}"
+
+
 def test_paper_unwanted_fields():
     """Test that paper-specific fields are removed when is_for_paper is used."""
     bibtex_str = """
